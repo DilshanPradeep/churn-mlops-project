@@ -28,7 +28,7 @@ def evaluate_models(model_dir, test_data_path, output_metrics_file):
     y_test = test_df["Churn"]
     
     # Find all models in the directory
-    model_files = [f for f in os.listdir(model_dir) if f.endswith(".pkl") and f != "scaler.pkl"]
+    model_files = [f for f in os.listdir(model_dir) if f.endswith(".pkl") and f != "scaler.pkl" and f != "encoders.pkl"]
     
     best_accuracy = 0.0
     best_model_name = ""

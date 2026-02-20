@@ -1,0 +1,100 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py --output data/raw/raw_data.csv
+    deps:
+    - path: data/raw/Churn Prediction DataSet.csv
+      hash: md5
+      md5: 0f9de68e012bd3aed5fa7cdc9fc421af
+      size: 977501
+    - path: src/data_ingestion.py
+      hash: md5
+      md5: 565a5cb0c20184e73a82a33366241531
+      size: 1153
+    outs:
+    - path: data/raw/raw_data.csv
+      hash: md5
+      md5: 7f07de26b054de4c36eed95a1277fe21
+      size: 978285
+  data_preprocessing:
+    cmd: python src/preprocessing.py --input data/raw/raw_data.csv --output 
+      data/processed
+    deps:
+    - path: data/raw/raw_data.csv
+      hash: md5
+      md5: 7f07de26b054de4c36eed95a1277fe21
+      size: 978285
+    - path: src/preprocessing.py
+      hash: md5
+      md5: 6cb7534c97cf5517ec8c068092bc969f
+      size: 2819
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 61008c59eb9cabee7b596a49e14cfa7d
+      size: 528224
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 9a4548686cedb1efce9d8be9d7bc8180
+      size: 2110870
+    - path: models/encoders.pkl
+      hash: md5
+      md5: b04d0bbfcf3fb17119d7a1a4fb0bc2b5
+      size: 750
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 0028bab4f9271b62b08e58e250d610c0
+      size: 1583
+  model_training:
+    cmd: python src/train.py --data data/processed/train.csv --model-dir models
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 9a4548686cedb1efce9d8be9d7bc8180
+      size: 2110870
+    - path: src/train.py
+      hash: md5
+      md5: 6da8ca336f33a0048e7253a2fe50ca18
+      size: 2522
+    outs:
+    - path: models/Logistic_Regression.pkl
+      hash: md5
+      md5: 98fa407f79ac96fb98f1d458d54ec0b9
+      size: 1551
+    - path: models/Random_Forest.pkl
+      hash: md5
+      md5: 7f304c4bc69d4373f7ffe6a140163ea4
+      size: 17804681
+    - path: models/XGBoost.pkl
+      hash: md5
+      md5: 2b255dc5846e8a4324b2583a48169b03
+      size: 287513
+  model_evaluation:
+    cmd: python src/evaluate.py --model-dir models --test-data 
+      data/processed/test.csv --metrics-file metrics.json
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 61008c59eb9cabee7b596a49e14cfa7d
+      size: 528224
+    - path: models/Logistic_Regression.pkl
+      hash: md5
+      md5: 98fa407f79ac96fb98f1d458d54ec0b9
+      size: 1551
+    - path: models/Random_Forest.pkl
+      hash: md5
+      md5: 7f304c4bc69d4373f7ffe6a140163ea4
+      size: 17804681
+    - path: models/XGBoost.pkl
+      hash: md5
+      md5: 2b255dc5846e8a4324b2583a48169b03
+      size: 287513
+    - path: src/evaluate.py
+      hash: md5
+      md5: d1bce38a3ef295e2b134991a6533f711
+      size: 3235
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 8f4369703f04dea0238dbc83349e1e9f
+      size: 702

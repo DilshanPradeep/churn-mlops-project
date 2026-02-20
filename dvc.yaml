@@ -1,0 +1,41 @@
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py --output data/raw/raw_data.csv
+    deps:
+      - src/data_ingestion.py
+      - data/raw/Churn Prediction DataSet.csv
+    outs:
+      - data/raw/raw_data.csv
+
+  data_preprocessing:
+    cmd: python src/preprocessing.py --input data/raw/raw_data.csv --output data/processed
+    deps:
+      - src/preprocessing.py
+      - data/raw/raw_data.csv
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - models/scaler.pkl
+      - models/encoders.pkl
+
+  model_training:
+    cmd: python src/train.py --data data/processed/train.csv --model-dir models
+    deps:
+      - src/train.py
+      - data/processed/train.csv
+    outs:
+      - models/Logistic_Regression.pkl
+      - models/Random_Forest.pkl
+      - models/XGBoost.pkl
+
+  model_evaluation:
+    cmd: python src/evaluate.py --model-dir models --test-data data/processed/test.csv --metrics-file metrics.json
+    deps:
+      - src/evaluate.py
+      - models/Logistic_Regression.pkl
+      - models/Random_Forest.pkl
+      - models/XGBoost.pkl
+      - data/processed/test.csv
+    metrics:
+      - metrics.json:
+          cache: false

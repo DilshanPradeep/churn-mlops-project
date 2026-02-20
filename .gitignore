@@ -1,0 +1,29 @@
+# Data
+data/
+!data/raw/*.csv.dvc
+!data/processed/*.csv.dvc
+*.csv
+
+# Models
+models/
+!models/*.pkl.dvc
+*.pkl
+
+# Environments
+venv/
+env/
+.env
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+
+# DVC
+.dvc/cache
+.dvc/tmp
+
+# OS
+.DS_Store
+Thumbs.db

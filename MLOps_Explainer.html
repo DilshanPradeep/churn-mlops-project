@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MLOps Churn Prediction – A to Z Explained</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0d0f1a;
+            --surface: #151828;
+            --surface2: #1e2235;
+            --border: #2a2f4a;
+            --accent: #6c63ff;
+            --accent2: #00d4aa;
+            --accent3: #ff6b6b;
+            --accent4: #ffd166;
+            --accent5: #4cc9f0;
+            --text: #e2e8f0;
+            --muted: #7d8ba3;
+            --code-bg: #0a0c16;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+        }
+
+        /* NAV */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 15, 26, .9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        nav span {
+            font-weight: 700;
+            font-size: .95rem;
+            color: var(--accent);
+            margin-right: auto;
+        }
+
+        nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: .8rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: .2s;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        /* HERO */
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem 3rem;
+            background: radial-gradient(ellipse at 50% 0%, rgba(108, 99, 255, .15) 0%, transparent 65%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #6c63ff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .75rem;
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .pipeline-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .ps-node {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .5rem 1rem;
+            font-size: .78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .ps-arrow {
+            color: var(--muted);
+            font-size: 1.2rem;
+            padding: 0 4px;
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        /* SECTION */
+        .step-section {
+            margin: 3rem 0;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .step-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .step-header .file-tag {
+            margin-left: auto;
+            font-size: .75rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .step-body {
+            padding: 1.5rem;
+        }
+
+        .step-body p {
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+
+        .step-body h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 .6rem;
+            color: var(--text);
+        }
+
+        /* CODE BLOCK */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.1rem 1.25rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            line-height: 1.65;
+            margin: .5rem 0 1rem;
+        }
+
+        .line-comment {
+            color: #4a9eff;
+        }
+
+        .kw {
+            color: #c792ea;
+        }
+
+        .fn {
+            color: #82aaff;
+        }
+
+        .str {
+            color: #c3e88d;
+        }
+
+        .num {
+            color: #f78c6c;
+        }
+
+        .cls {
+            color: #ffcb6b;
+        }
+
+        /* EXAMPLE BOX */
+        .example-box {
+            background: var(--surface2);
+            border-left: 3px solid var(--accent2);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: .5rem 0 1rem;
+            font-size: .88rem;
+        }
+
+        .example-box strong {
+            color: var(--accent2);
+            display: block;
+            margin-bottom: .4rem;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        /* INFO GRID */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .info-card .label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+            margin-bottom: .4rem;
+        }
+
+        .info-card .value {
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .85rem;
+            margin: 1rem 0;
+        }
+
+        th {
+            background: var(--surface2);
+            padding: .6rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: .55rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        td strong {
+            color: var(--text);
+        }
+
+        /* FLOW DIAGRAM */
+        .flow {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .flow-box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .5rem .9rem;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            color: var(--muted);
+        }
+
+        /* BADGE */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 600;
+            margin: 0 3px 3px 0;
+        }
+
+        /* COLOR HELPERS */
+        .c-purple {
+            color: var(--accent) !important;
+        }
+
+        .c-teal {
+            color: var(--accent2) !important;
+        }
+
+        .c-red {
+            color: var(--accent3) !important;
+        }
+
+        .c-yellow {
+            color: var(--accent4) !important;
+        }
+
+        .c-blue {
+            color: var(--accent5) !important;
+        }
+
+        .bg-purple {
+            background: rgba(108, 99, 255, .15);
+            border-color: var(--accent);
+        }
+
+        .bg-teal {
+            background: rgba(0, 212, 170, .12);
+            border-color: var(--accent2);
+        }
+
+        .bg-red {
+            background: rgba(255, 107, 107, .12);
+            border-color: var(--accent3);
+        }
+
+        .bg-yellow {
+            background: rgba(255, 209, 102, .12);
+            border-color: var(--accent4);
+        }
+
+        .bg-blue {
+            background: rgba(76, 201, 240, .12);
+            border-color: var(--accent5);
+        }
+
+        /* CALLOUT */
+        .callout {
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            border-left: 3px solid;
+            font-size: .88rem;
+        }
+
+        .callout.info {
+            background: rgba(76, 201, 240, .08);
+            border-color: var(--accent5);
+        }
+
+        .callout.warn {
+            background: rgba(255, 209, 102, .08);
+            border-color: var(--accent4);
+        }
+
+        .callout.success {
+            background: rgba(0, 212, 170, .08);
+            border-color: var(--accent2);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: .82rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <span>🤖 MLOps A → Z</span>
+        <a href="#s1">1. Ingestion</a>
+        <a href="#s2">2. Preprocessing</a>
+        <a href="#s3">3. Training</a>
+        <a href="#s4">4. Evaluation</a>
+        <a href="#s5">5. DVC Pipeline</a>
+        <a href="#s6">6. MLflow</a>
+        <a href="#s7">7. Prediction API</a>
+        <a href="#s8">8. Docker</a>
+    </nav>
+
+    <div class="hero">
+        <h1>Customer Churn MLOps Pipeline</h1>
+        <p>Every. Single. Step. Explained from raw CSV → trained models → live prediction API — with real code from your
+            project.</p>
+        <div class="pipeline-strip">
+            <div class="ps-node" style="border-color:var(--accent);color:var(--accent);">📂 Raw Data</div>
+            <div class="ps-arrow">→</div>
+            <div class="ps-node" style="border-color:var(--accent2);color:var(--accent2);">🔧 Preprocess</div>
+            <div class="ps-arrow">→</div>
+            <div class="ps-node" style="border-color:var(--accent4);color:var(--accent4);">🏋️ Train</div>
+            <div class="ps-arrow">→</div>
+            <div class="ps-node" style="border-color:var(--accent3);color:var(--accent3);">📊 Evaluate</div>
+            <div class="ps-arrow">→</div>
+            <div class="ps-node" style="border-color:var(--accent5);color:var(--accent5);">🚀 API</div>
+            <div class="ps-arrow">→</div>
+            <div class="ps-node" style="border-color:#ff9f43;color:#ff9f43;">🐋 Docker</div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- ====== STEP 1: DATA INGESTION ====== -->
+        <div class="step-section" id="s1">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(108,99,255,.2);color:var(--accent);">1</div>
+                <div>
+                    <h2 class="c-purple">Data Ingestion</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Loading raw data into the pipeline</div>
+                </div>
+                <div class="file-tag">src/data_ingestion.py</div>
+            </div>
+            <div class="step-body">
+                <p>This is the <strong>entry point</strong> of the entire pipeline. The goal is simple: pick up the raw
+                    <code>Churn Prediction DataSet.csv</code> file and copy it into a known location so every downstream
+                    step knows exactly where to find clean input data.</p>
+
+                <h3>What the code does (line by line):</h3>
+                <pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> os, argparse
+
+<span class="kw">def</span> <span class="fn">load_data</span>(output_path):
+    <span class="line-comment"># 1. Build the path to the original raw CSV file</span>
+    source_path = os.path.<span class="fn">join</span>(<span class="str">"data"</span>, <span class="str">"raw"</span>, <span class="str">"Churn Prediction DataSet.csv"</span>)
+
+    <span class="line-comment"># 2. Make sure the file actually exists (fail early if missing)</span>
+    <span class="kw">if not</span> os.path.<span class="fn">exists</span>(source_path):
+        <span class="kw">raise</span> <span class="cls">FileNotFoundError</span>(...)
+
+    <span class="line-comment"># 3. Load with pandas – gives us a DataFrame in memory</span>
+    df = pd.<span class="fn">read_csv</span>(source_path)
+    print(<span class="str">f"Data Loaded. Shape: {df.shape}"</span>)  <span class="line-comment"># e.g. (7043, 21)</span>
+
+    <span class="line-comment"># 4. Create the output directory if it doesn't exist</span>
+    os.<span class="fn">makedirs</span>(os.path.<span class="fn">dirname</span>(output_path), exist_ok=<span class="kw">True</span>)
+
+    <span class="line-comment"># 5. Save exactly as-is – no modification yet</span>
+    df.<span class="fn">to_csv</span>(output_path, index=<span class="kw">False</span>)</code></pre>
+
+                <div class="example-box">
+                    <strong>📌 Real Example</strong>
+                    Input: <code>data/raw/Churn Prediction DataSet.csv</code> — 7 043 customer rows, 21 columns (gender,
+                    tenure, MonthlyCharges, Churn…)<br />
+                    Output: <code>data/raw/raw_data.csv</code> — identical copy, ready for preprocessing
+                </div>
+
+                <h3>Why copy instead of read directly?</h3>
+                <p>In real MLOps the "source" might be a database, an S3 bucket, or an API. Copying it creates a
+                    <strong>versioned snapshot</strong> — DVC can then track exactly which version of the data produced
+                    which model.</p>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">Command to run</div>
+                        <div class="value" style="font-family:monospace;font-size:.8rem;">python src/data_ingestion.py
+                            --output data/raw/raw_data.csv</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Input</div>
+                        <div class="value">data/raw/Churn Prediction DataSet.csv</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Output</div>
+                        <div class="value">data/raw/raw_data.csv</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== STEP 2: PREPROCESSING ====== -->
+        <div class="step-section" id="s2">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(0,212,170,.15);color:var(--accent2);">2</div>
+                <div>
+                    <h2 class="c-teal">Data Preprocessing</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Cleaning, encoding, scaling, and splitting data
+                    </div>
+                </div>
+                <div class="file-tag">src/preprocessing.py</div>
+            </div>
+            <div class="step-body">
+                <p>Raw data is messy. Models only understand numbers. This step transforms the raw CSV into clean,
+                    numeric, scaled features — then splits it into <strong>train (80%)</strong> and <strong>test
+                        (20%)</strong> sets.</p>
+
+                <h3>Sub-step 1 — Fix TotalCharges (blank → number)</h3>
+                <pre><code><span class="line-comment"># Some rows have TotalCharges as " " (blank string), not a number</span>
+df[<span class="str">'TotalCharges'</span>] = pd.<span class="fn">to_numeric</span>(df[<span class="str">'TotalCharges'</span>], errors=<span class="str">'coerce'</span>)
+<span class="line-comment"># errors='coerce' converts invalid strings to NaN</span>
+df[<span class="str">'TotalCharges'</span>] = df[<span class="str">'TotalCharges'</span>].<span class="fn">fillna</span>(df[<span class="str">'TotalCharges'</span>].<span class="fn">median</span>())
+<span class="line-comment"># Fill those NaN with the median value (robust to outliers)</span></code></pre>
+                <div class="example-box">
+                    <strong>Example</strong>
+                    Row 489: TotalCharges = <code>" "</code> → converted to NaN → replaced with <code>1397.47</code>
+                    (median)
+                </div>
+
+                <h3>Sub-step 2 — Drop customerID</h3>
+                <pre><code>df.<span class="fn">drop</span>(columns=[<span class="str">'customerID'</span>], inplace=<span class="kw">True</span>)
+<span class="line-comment"># customerID is unique per row – zero predictive value, would confuse the model</span></code></pre>
+
+                <h3>Sub-step 3 — Label Encode all text columns</h3>
+                <pre><code>le = <span class="cls">LabelEncoder</span>()
+categorical_cols = df.<span class="fn">select_dtypes</span>(include=[<span class="str">'object'</span>]).columns
+
+<span class="kw">for</span> col <span class="kw">in</span> categorical_cols:
+    df[col] = le.<span class="fn">fit_transform</span>(df[col])
+    encoders[col] = le  <span class="line-comment"># save encoder so API can reuse it later!</span></code></pre>
+                <div class="example-box">
+                    <strong>Example – what gets encoded</strong>
+                    <code>gender</code>: "Female"→0, "Male"→1 &nbsp;|&nbsp;
+                    <code>Partner</code>: "No"→0, "Yes"→1 &nbsp;|&nbsp;
+                    <code>Contract</code>: "Month-to-month"→0, "One year"→1, "Two year"→2
+                </div>
+
+                <h3>Sub-step 4 — StandardScaler (Feature Scaling)</h3>
+                <pre><code>scaler = <span class="cls">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(X)
+<span class="line-comment"># Transforms each feature: (value - mean) / std_deviation</span>
+<span class="line-comment"># Result: all features have mean≈0 and std≈1</span>
+
+joblib.<span class="fn">dump</span>(scaler, <span class="str">"models/scaler.pkl"</span>)   <span class="line-comment"># save for API use</span>
+joblib.<span class="fn">dump</span>(encoders, <span class="str">"models/encoders.pkl"</span>) <span class="line-comment"># save for API use</span></code></pre>
+                <div class="example-box">
+                    <strong>Why scale?</strong>
+                    Raw <code>MonthlyCharges</code> = 89.10 but raw <code>tenure</code> = 2. Without scaling, models
+                    like Logistic Regression and SVM treat the bigger number as "more important". Scaling puts them on
+                    equal footing.
+                </div>
+
+                <h3>Sub-step 5 — Train / Test Split</h3>
+                <pre><code>train, test = <span class="fn">train_test_split</span>(X_processed, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+<span class="line-comment"># 80% → train.csv   (≈5634 rows)</span>
+<span class="line-comment"># 20% → test.csv    (≈1409 rows)</span>
+<span class="line-comment"># random_state=42 means the same split every time (reproducible)</span></code></pre>
+
+                <h3>Files saved after this step:</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">Train data</div>
+                        <div class="value">data/processed/train.csv</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Test data</div>
+                        <div class="value">data/processed/test.csv</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Scaler</div>
+                        <div class="value">models/scaler.pkl</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Encoders</div>
+                        <div class="value">models/encoders.pkl</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Column order</div>
+                        <div class="value">models/feature_columns.json</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== STEP 3: TRAINING ====== -->
+        <div class="step-section" id="s3">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(255,209,102,.15);color:var(--accent4);">3</div>
+                <div>
+                    <h2 class="c-yellow">Model Training</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Training 3 models + logging to MLflow</div>
+                </div>
+                <div class="file-tag">src/train.py</div>
+            </div>
+            <div class="step-body">
+                <p>Three different ML algorithms compete to learn the pattern "will this customer churn?". Every
+                    training run is tracked by <strong>MLflow</strong> for full experiment traceability.</p>
+
+                <h3>The 3 models defined:</h3>
+                <pre><code>models = {
+    <span class="str">"Logistic_Regression"</span>: <span class="cls">LogisticRegression</span>(),
+    <span class="str">"Random_Forest"</span>:       <span class="cls">RandomForestClassifier</span>(n_estimators=<span class="num">100</span>),
+    <span class="str">"XGBoost"</span>:             <span class="cls">XGBClassifier</span>(use_label_encoder=<span class="kw">False</span>, eval_metric=<span class="str">'logloss'</span>)
+}</code></pre>
+
+                <table>
+                    <tr>
+                        <th>Model</th>
+                        <th>How it works</th>
+                        <th>Best for</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Logistic Regression</strong></td>
+                        <td>Draws a straight decision boundary; outputs probabilities via sigmoid</td>
+                        <td>Baseline, interpretable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Random Forest</strong></td>
+                        <td>Builds 100 trees on random data subsets, majority vote wins</td>
+                        <td>Handles complex patterns</td>
+                    </tr>
+                    <tr>
+                        <td><strong>XGBoost</strong></td>
+                        <td>Builds trees sequentially, each correcting the previous one's errors</td>
+                        <td>Usually best accuracy</td>
+                    </tr>
+                </table>
+
+                <h3>Training loop with MLflow tracking:</h3>
+                <pre><code>mlflow.<span class="fn">set_experiment</span>(<span class="str">"Churn_Prediction_Training"</span>)
+
+<span class="kw">for</span> name, model <span class="kw">in</span> models.<span class="fn">items</span>():
+    <span class="kw">with</span> mlflow.<span class="fn">start_run</span>(run_name=name):  <span class="line-comment"># opens a new tracked run</span>
+
+        model.<span class="fn">fit</span>(X_train, y_train)         <span class="line-comment"># ← actual training happens here</span>
+
+        mlflow.<span class="fn">log_param</span>(<span class="str">"model_name"</span>, name) <span class="line-comment"># log which model</span>
+
+        <span class="line-comment"># Log the model artifact to MLflow</span>
+        <span class="kw">if</span> name == <span class="str">"XGBoost"</span>:
+            mlflow.xgboost.<span class="fn">log_model</span>(model, <span class="str">"model"</span>)
+        <span class="kw">else</span>:
+            mlflow.sklearn.<span class="fn">log_model</span>(model, <span class="str">"model"</span>)
+
+        <span class="line-comment"># Also save locally as a .pkl file</span>
+        model_path = os.path.<span class="fn">join</span>(model_dir, <span class="str">f"{name}.pkl"</span>)
+        joblib.<span class="fn">dump</span>(model, model_path)</code></pre>
+
+                <div class="example-box">
+                    <strong>📌 What happens during model.fit()?</strong>
+                    For each of the 5 634 training rows, the model adjusts its internal weights/parameters to minimise
+                    prediction error. After fit(), the model "knows" patterns like: <em>customers with month-to-month
+                        contracts and high monthly charges are more likely to churn</em>.
+                </div>
+
+                <h3>Files saved after this step:</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">Model 1</div>
+                        <div class="value">models/Logistic_Regression.pkl</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Model 2</div>
+                        <div class="value">models/Random_Forest.pkl</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Model 3</div>
+                        <div class="value">models/XGBoost.pkl</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== STEP 4: EVALUATION ====== -->
+        <div class="step-section" id="s4">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(255,107,107,.15);color:var(--accent3);">4</div>
+                <div>
+                    <h2 class="c-red">Model Evaluation</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Scoring models on unseen test data, picking the
+                        best</div>
+                </div>
+                <div class="file-tag">src/evaluate.py</div>
+            </div>
+            <div class="step-body">
+                <p>We now test each saved model on the <strong>test.csv</strong> — data the model has <em>never
+                        seen</em>. Five metrics are computed and logged to MLflow. The model with the highest accuracy
+                    is automatically saved as <code>best_model.pkl</code> for the API.</p>
+
+                <h3>The 5 metrics explained:</h3>
+                <pre><code><span class="kw">def</span> <span class="fn">eval_metrics</span>(actual, pred):
+    accuracy  = <span class="fn">accuracy_score</span>(actual, pred)   <span class="line-comment"># correct / total</span>
+    precision = <span class="fn">precision_score</span>(actual, pred)  <span class="line-comment"># of predicted churn, how many really did</span>
+    recall    = <span class="fn">recall_score</span>(actual, pred)     <span class="line-comment"># of real churners, how many did we catch</span>
+    f1        = <span class="fn">f1_score</span>(actual, pred)         <span class="line-comment"># harmonic mean of precision + recall</span>
+    roc_auc   = <span class="fn">roc_auc_score</span>(actual, pred)   <span class="line-comment"># area under the ROC curve (0.5–1.0)</span>
+    <span class="kw">return</span> accuracy, precision, recall, f1, roc_auc</code></pre>
+
+                <table>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Formula</th>
+                        <th>What it tells you</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Accuracy</strong></td>
+                        <td>Correct / Total</td>
+                        <td>Overall correctness</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Precision</strong></td>
+                        <td>TP / (TP+FP)</td>
+                        <td>Low false alarms (don't waste retention budget)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recall</strong></td>
+                        <td>TP / (TP+FN)</td>
+                        <td>Don't miss churners (catch them before they leave)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>F1 Score</strong></td>
+                        <td>2·P·R / (P+R)</td>
+                        <td>Balance between Precision and Recall</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ROC AUC</strong></td>
+                        <td>Area under curve</td>
+                        <td>Ranking quality across all thresholds</td>
+                    </tr>
+                </table>
+
+                <h3>Best model selection + MLflow logging:</h3>
+                <pre><code><span class="kw">for</span> model_file <span class="kw">in</span> model_files:
+    model = joblib.<span class="fn">load</span>(model_path)
+    predicted = model.<span class="fn">predict</span>(X_test)
+    (acc, prec, rec, f1, roc) = <span class="fn">eval_metrics</span>(y_test, predicted)
+
+    <span class="kw">with</span> mlflow.<span class="fn">start_run</span>(run_name=<span class="str">f"Eval_{name}"</span>):
+        mlflow.<span class="fn">log_metric</span>(<span class="str">"accuracy"</span>,  acc)
+        mlflow.<span class="fn">log_metric</span>(<span class="str">"precision"</span>, prec)
+        mlflow.<span class="fn">log_metric</span>(<span class="str">"recall"</span>,    rec)
+        mlflow.<span class="fn">log_metric</span>(<span class="str">"f1_score"</span>,  f1)
+        mlflow.<span class="fn">log_metric</span>(<span class="str">"roc_auc"</span>,  roc)
+
+    <span class="kw">if</span> acc &gt; best_accuracy:
+        best_accuracy = acc
+        joblib.<span class="fn">dump</span>(model, <span class="str">"models/best_model.pkl"</span>)  <span class="line-comment"># ← winner!</span>
+
+<span class="line-comment"># Save all metrics to metrics.json (DVC tracks this file)</span>
+<span class="kw">with</span> <span class="fn">open</span>(output_metrics_file, <span class="str">"w"</span>) <span class="kw">as</span> f:
+    json.<span class="fn">dump</span>(metrics_summary, f, indent=<span class="num">4</span>)</code></pre>
+
+                <div class="example-box">
+                    <strong>📌 Typical output you'd see</strong>
+                    Evaluating Logistic_Regression... Accuracy: 0.802<br />
+                    Evaluating Random_Forest... Accuracy: 0.791<br />
+                    Evaluating XGBoost... Accuracy: 0.815 ← <strong>Best Model!</strong><br />
+                    → XGBoost saved as models/best_model.pkl
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== STEP 5: DVC PIPELINE ====== -->
+        <div class="step-section" id="s5">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(76,201,240,.15);color:var(--accent5);">5</div>
+                <div>
+                    <h2 class="c-blue">DVC Pipeline Orchestration</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Automating all 4 stages with one command</div>
+                </div>
+                <div class="file-tag">dvc.yaml</div>
+            </div>
+            <div class="step-body">
+                <p><strong>DVC (Data Version Control)</strong> is like Git — but for <em>data and models</em>. The
+                    <code>dvc.yaml</code> file defines the entire pipeline as a DAG (Directed Acyclic Graph) of stages
+                    with <strong>dependencies</strong> and <strong>outputs</strong>.</p>
+
+                <h3>Your dvc.yaml — all 4 stages:</h3>
+                <pre><code>stages:
+  <span class="line-comment"># STAGE 1 ──────────────────────────────────────────────────────</span>
+  data_ingestion:
+    cmd: <span class="str">python src/data_ingestion.py --output data/raw/raw_data.csv</span>
+    deps:                               <span class="line-comment"># inputs DVC watches for changes</span>
+      - src/data_ingestion.py
+      - data/raw/Churn Prediction DataSet.csv
+    outs:                               <span class="line-comment"># outputs DVC caches + tracks</span>
+      - data/raw/raw_data.csv
+
+  <span class="line-comment"># STAGE 2 ──────────────────────────────────────────────────────</span>
+  data_preprocessing:
+    cmd: <span class="str">python src/preprocessing.py --input data/raw/raw_data.csv --output data/processed</span>
+    deps:
+      - src/preprocessing.py
+      - data/raw/raw_data.csv           <span class="line-comment"># depends on stage 1 output!</span>
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - models/scaler.pkl
+      - models/encoders.pkl
+
+  <span class="line-comment"># STAGE 3 ──────────────────────────────────────────────────────</span>
+  model_training:
+    cmd: <span class="str">python src/train.py --data data/processed/train.csv --model-dir models</span>
+    deps:
+      - src/train.py
+      - data/processed/train.csv        <span class="line-comment"># depends on stage 2 output!</span>
+    outs:
+      - models/Logistic_Regression.pkl
+      - models/Random_Forest.pkl
+      - models/XGBoost.pkl
+
+  <span class="line-comment"># STAGE 4 ──────────────────────────────────────────────────────</span>
+  model_evaluation:
+    cmd: <span class="str">python src/evaluate.py --model-dir models --test-data data/processed/test.csv --metrics-file metrics.json</span>
+    deps:
+      - src/evaluate.py
+      - models/Logistic_Regression.pkl  <span class="line-comment"># depends on stage 3 outputs!</span>
+      - models/Random_Forest.pkl
+      - models/XGBoost.pkl
+      - data/processed/test.csv
+    metrics:
+      - metrics.json:
+          cache: false                  <span class="line-comment"># DVC tracks this as a metrics file</span></code></pre>
+
+                <div class="flow" style="margin:1.25rem 0;">
+                    <div class="flow-box" style="border-color:var(--accent);">data_ingestion</div>
+                    <div class="flow-arrow">→ feeds →</div>
+                    <div class="flow-box" style="border-color:var(--accent2);">data_preprocessing</div>
+                    <div class="flow-arrow">→ feeds →</div>
+                    <div class="flow-box" style="border-color:var(--accent4);">model_training</div>
+                    <div class="flow-arrow">→ feeds →</div>
+                    <div class="flow-box" style="border-color:var(--accent3);">model_evaluation</div>
+                </div>
+
+                <div class="callout info">
+                    <strong>🔑 Key DVC superpower:</strong> If only <code>train.py</code> changes, DVC skips stages 1
+                    &amp; 2 (data hasn't changed) and only reruns stages 3 &amp; 4. This saves huge amounts of time on
+                    big datasets.
+                </div>
+
+                <h3>The one command to run everything:</h3>
+                <pre><code><span class="line-comment"># Runs ALL 4 stages in the correct order, skipping unchanged ones</span>
+dvc repro</code></pre>
+
+                <h3>Push data to DagsHub remote:</h3>
+                <pre><code><span class="line-comment"># After dvc repro, push data + models to the remote (DagsHub / S3 / GDrive)</span>
+dvc push</code></pre>
+            </div>
+        </div>
+
+        <!-- ====== STEP 6: MLFLOW ====== -->
+        <div class="step-section" id="s6">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(255,159,67,.15);color:#ff9f43;">6</div>
+                <div>
+                    <h2 style="color:#ff9f43;">MLflow Experiment Tracking</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Logging, comparing, and managing experiments</div>
+                </div>
+                <div class="file-tag">used in train.py &amp; evaluate.py</div>
+            </div>
+            <div class="step-body">
+                <p><strong>MLflow</strong> is the experiment management system. Every time you train or evaluate, it
+                    automatically records what happened — so you can compare runs and go back in time.</p>
+
+                <h3>4 core MLflow concepts:</h3>
+                <table>
+                    <tr>
+                        <th>Concept</th>
+                        <th>What it stores</th>
+                        <th>Example in your code</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Experiment</strong></td>
+                        <td>A named group of related runs</td>
+                        <td><code>mlflow.set_experiment("Churn_Prediction_Training")</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Run</strong></td>
+                        <td>One execution with a unique ID</td>
+                        <td><code>with mlflow.start_run(run_name="XGBoost")</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Params</strong></td>
+                        <td>Settings / hyperparameters</td>
+                        <td><code>mlflow.log_param("model_name", name)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Metrics</strong></td>
+                        <td>Numeric performance numbers</td>
+                        <td><code>mlflow.log_metric("accuracy", 0.815)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Artifacts</strong></td>
+                        <td>Files (models, plots, data)</td>
+                        <td><code>mlflow.sklearn.log_model(model, "model")</code></td>
+                    </tr>
+                </table>
+
+                <h3>How to view the MLflow UI:</h3>
+                <pre><code><span class="line-comment"># Run in your terminal from the project root</span>
+mlflow ui
+
+<span class="line-comment"># Then open your browser at:</span>
+<span class="line-comment"># http://127.0.0.1:5000</span></code></pre>
+
+                <div class="example-box">
+                    <strong>📌 What you'll see in the UI</strong>
+                    Two experiments: <code>Churn_Prediction_Training</code> (3 runs: LR, RF, XGB) and
+                    <code>Churn_Prediction_Evaluation</code> (3 runs with metrics). You can click any run to see its
+                    exact accuracy, precision, recall, and download the saved model.
+                </div>
+
+                <div class="callout success">
+                    <strong>💡 DagsHub Integration:</strong> If you set <code>MLFLOW_TRACKING_URI</code> to your DagsHub
+                    repo URL, all experiments are automatically synced to the cloud — visible to your entire team.
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== STEP 7: PREDICTION API ====== -->
+        <div class="step-section" id="s7">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(0,212,170,.15);color:var(--accent2);">7</div>
+                <div>
+                    <h2 class="c-teal">Prediction API (FastAPI)</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Serving the best model as a REST endpoint</div>
+                </div>
+                <div class="file-tag">api/main.py</div>
+            </div>
+            <div class="step-body">
+                <p>The <strong>FastAPI</strong> app takes customer data via HTTP POST, applies the same encoding and
+                    scaling as training, runs the best model, and returns a churn prediction with probability.</p>
+
+                <h3>Startup — loading saved artifacts:</h3>
+                <pre><code><span class="line-comment"># At API startup, load everything saved during training/preprocessing:</span>
+model    = joblib.<span class="fn">load</span>(<span class="str">"models/best_model.pkl"</span>)    <span class="line-comment"># best model</span>
+scaler   = joblib.<span class="fn">load</span>(<span class="str">"models/scaler.pkl"</span>)        <span class="line-comment"># same scaler used in training</span>
+encoders = joblib.<span class="fn">load</span>(<span class="str">"models/encoders.pkl"</span>)      <span class="line-comment"># same label encoders</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"models/feature_columns.json"</span>) <span class="kw">as</span> f:
+    feature_columns = json.<span class="fn">load</span>(f)                  <span class="line-comment"># correct column order</span></code></pre>
+
+                <h3>Input schema (Pydantic model):</h3>
+                <pre><code><span class="kw">class</span> <span class="cls">CustomerData</span>(BaseModel):
+    gender: str          <span class="line-comment"># "Male" or "Female"</span>
+    SeniorCitizen: int   <span class="line-comment"># 0 or 1</span>
+    Partner: str         <span class="line-comment"># "Yes" or "No"</span>
+    tenure: int          <span class="line-comment"># months (e.g. 24)</span>
+    MonthlyCharges: float
+    TotalCharges: float
+    Contract: str        <span class="line-comment"># "Month-to-month", "One year", "Two year"</span>
+    <span class="line-comment"># ... + 12 more fields</span></code></pre>
+
+                <h3>The /predict endpoint — step by step:</h3>
+                <pre><code><span class="kw">@app.post</span>(<span class="str">"/predict"</span>)
+<span class="kw">def</span> <span class="fn">predict_churn</span>(data: <span class="cls">CustomerData</span>):
+
+    <span class="line-comment"># Step A: Convert Pydantic model to plain dict</span>
+    input_dict = data.<span class="fn">dict</span>()
+
+    <span class="line-comment"># Step B: Encode categorical columns using SAVED encoders</span>
+    <span class="kw">for</span> col, value <span class="kw">in</span> input_dict.<span class="fn">items</span>():
+        <span class="kw">if</span> col <span class="kw">in</span> encoders:
+            input_dict[col] = <span class="fn">int</span>(encoders[col].<span class="fn">transform</span>([value])[<span class="num">0</span>])
+
+    <span class="line-comment"># Step C: Build DataFrame + enforce correct column order</span>
+    input_df = pd.<span class="cls">DataFrame</span>([input_dict])[feature_columns]
+
+    <span class="line-comment"># Step D: Apply the SAME scaler used in training</span>
+    input_scaled = scaler.<span class="fn">transform</span>(input_df)
+
+    <span class="line-comment"># Step E: Predict class (0=No, 1=Yes) and probability</span>
+    prediction = model.<span class="fn">predict</span>(input_scaled)[<span class="num">0</span>]
+    prob = model.<span class="fn">predict_proba</span>(input_scaled)[<span class="num">0</span>][<span class="num">1</span>]
+
+    <span class="kw">return</span> {
+        <span class="str">"prediction"</span>: <span class="str">"Yes"</span> <span class="kw">if</span> prediction == <span class="num">1</span> <span class="kw">else</span> <span class="str">"No"</span>,
+        <span class="str">"churn_probability"</span>: <span class="fn">round</span>(<span class="fn">float</span>(prob), <span class="num">4</span>),
+        <span class="str">"message"</span>: <span class="str">"High risk!"</span> <span class="kw">if</span> prob &gt; <span class="num">0.6</span> <span class="kw">else</span> <span class="str">"Low risk."</span>
+    }</code></pre>
+
+                <div class="example-box">
+                    <strong>📌 Example Request (curl / Postman)</strong>
+                    POST http://localhost:8000/predict<br />
+                    Body:
+                    <code>{"gender":"Male","SeniorCitizen":0,"Partner":"No","tenure":2,"Contract":"Month-to-month","MonthlyCharges":70.5,"TotalCharges":141.0, ...}</code><br /><br />
+                    <strong>Response:</strong>
+                    <code>{"prediction":"Yes","churn_probability":0.7821,"message":"High risk - prepare retention offer!"}</code>
+                </div>
+
+                <h3>How to start the API:</h3>
+                <pre><code><span class="line-comment"># From the project root directory:</span>
+uvicorn api.main:app --reload
+
+<span class="line-comment"># Interactive API docs automatically at:</span>
+<span class="line-comment"># http://127.0.0.1:8000/docs  (Swagger UI)</span></code></pre>
+            </div>
+        </div>
+
+        <!-- ====== STEP 8: DOCKER ====== -->
+        <div class="step-section" id="s8">
+            <div class="step-header">
+                <div class="step-num" style="background:rgba(255,159,67,.15);color:#ff9f43;">8</div>
+                <div>
+                    <h2 style="color:#ff9f43;">Docker – Containerising the API</h2>
+                    <div style="color:var(--muted);font-size:.82rem;">Packaging the app so it runs anywhere</div>
+                </div>
+                <div class="file-tag">Dockerfile</div>
+            </div>
+            <div class="step-body">
+                <p>Docker wraps the entire application — Python, libraries, models, code — into a single portable image.
+                    You can run it on any machine, cloud, or Kubernetes cluster with one command.</p>
+
+                <h3>How Docker fits into the pipeline:</h3>
+                <div class="flow">
+                    <div class="flow-box">dvc repro<br /><small style="color:var(--muted)">→ trains models</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">docker build<br /><small style="color:var(--muted)">→ packages app</small>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">docker run<br /><small style="color:var(--muted)">→ live API</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">docker push<br /><small style="color:var(--muted)">→ deploy to cloud</small>
+                    </div>
+                </div>
+
+                <h3>Key Docker commands for your project:</h3>
+                <pre><code><span class="line-comment"># Build the image (from project root, where Dockerfile is)</span>
+docker build -t churn-prediction-api .
+
+<span class="line-comment"># Run the container, expose port 8000</span>
+docker run -p 8000:8000 churn-prediction-api
+
+<span class="line-comment"># The API is now live at http://localhost:8000</span>
+<span class="line-comment"># Same /predict endpoint, same /docs UI</span></code></pre>
+
+                <div class="callout warn">
+                    <strong>⚠️ Important:</strong> The <code>models/</code> folder must exist and contain
+                    <code>best_model.pkl</code>, <code>scaler.pkl</code>, <code>encoders.pkl</code>, and
+                    <code>feature_columns.json</code> before building the Docker image. Run <code>dvc repro</code>
+                    first.
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== FULL PIPELINE SUMMARY ====== -->
+        <div
+            style="margin:3rem 0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;">
+            <h2 style="text-align:center;margin-bottom:1.5rem;font-size:1.5rem;">🗺️ Complete Pipeline — At a Glance
+            </h2>
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>Stage</th>
+                    <th>File</th>
+                    <th>Input</th>
+                    <th>Output</th>
+                    <th>Tool</th>
+                </tr>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>Data Ingestion</td>
+                    <td>data_ingestion.py</td>
+                    <td>Churn DataSet.csv</td>
+                    <td>raw_data.csv</td>
+                    <td>Pandas</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td>Preprocessing</td>
+                    <td>preprocessing.py</td>
+                    <td>raw_data.csv</td>
+                    <td>train.csv, test.csv, scaler.pkl, encoders.pkl</td>
+                    <td>Scikit-learn</td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td>Training</td>
+                    <td>train.py</td>
+                    <td>train.csv</td>
+                    <td>LR.pkl, RF.pkl, XGB.pkl + MLflow runs</td>
+                    <td>Scikit-learn, XGBoost, MLflow</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td>Evaluation</td>
+                    <td>evaluate.py</td>
+                    <td>test.csv + .pkl models</td>
+                    <td>best_model.pkl, metrics.json + MLflow runs</td>
+                    <td>Scikit-learn, MLflow</td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td>Orchestration</td>
+                    <td>dvc.yaml</td>
+                    <td>All above</td>
+                    <td>Reproducible pipeline DAG</td>
+                    <td>DVC</td>
+                </tr>
+                <tr>
+                    <td><strong>6</strong></td>
+                    <td>Prediction API</td>
+                    <td>api/main.py</td>
+                    <td>HTTP POST JSON</td>
+                    <td>Churn prediction + probability</td>
+                    <td>FastAPI, Uvicorn</td>
+                </tr>
+                <tr>
+                    <td><strong>7</strong></td>
+                    <td>Containerisation</td>
+                    <td>Dockerfile</td>
+                    <td>API + models</td>
+                    <td>Docker image</td>
+                    <td>Docker</td>
+                </tr>
+            </table>
+        </div>
+
+    </div><!-- end container -->
+
+    <footer>
+        CHurn MLOps Project &nbsp;·&nbsp; SLTC SEM 7 Machine Learning Operations &nbsp;·&nbsp; Generated by Antigravity
+        AI
+    </footer>
+
+</body>
+
+</html>

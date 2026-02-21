@@ -51,6 +51,11 @@ def preprocess_data(input_path, output_dir):
     os.makedirs("models", exist_ok=True)
     joblib.dump(scaler, "models/scaler.pkl")
     
+    # Save feature column order (critical for API to get correct ordering)
+    import json
+    with open("models/feature_columns.json", "w") as f:
+        json.dump(list(X.columns), f)
+    
     # Save encoders for API
     joblib.dump(encoders, "models/encoders.pkl")
     

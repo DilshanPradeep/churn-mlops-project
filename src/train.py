@@ -8,6 +8,7 @@ from xgboost import XGBClassifier
 import joblib
 import os
 import argparse
+import json
 
 def train_models(train_data_path, model_dir):
     # Load Data
@@ -18,6 +19,13 @@ def train_models(train_data_path, model_dir):
     
     X_train = train_df.drop("Churn", axis=1)
     y_train = train_df["Churn"]
+
+    # Save feature column names for the API
+    os.makedirs(model_dir, exist_ok=True)
+    feature_columns = list(X_train.columns)
+    with open(os.path.join(model_dir, "feature_columns.json"), "w") as f:
+        json.dump(feature_columns, f)
+    print(f"Saved feature_columns.json with {len(feature_columns)} columns")
     
     # Define Models to Train [cite: 60]
     models = {
@@ -39,7 +47,7 @@ def train_models(train_data_path, model_dir):
     
     mlflow.set_experiment("Churn_Prediction_Training")
 
-    os.makedirs(model_dir, exist_ok=True)
+    os.makedirs(model_dir, exist_ok=True)  # already created above, harmless
 
     for name, model in models.items():
         with mlflow.start_run(run_name=name):

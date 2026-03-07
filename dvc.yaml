@@ -19,28 +19,23 @@ stages:
       - models/encoders.pkl
 
   model_training:
-    cmd: python src/train.py --data data/processed/train.csv --model-dir models --params params.yaml
+    cmd: python src/train.py --data data/processed/train.csv --model-dir models
     deps:
       - src/train.py
       - data/processed/train.csv
-    params:
-      - model.name
-      - model.n_estimators
-      - model.max_iter
-      - model.max_depth
-      - model.learning_rate
     outs:
-      - models/${model.name}.pkl:
-          cache: true
+      - models/Logistic_Regression.pkl
+      - models/Random_Forest.pkl
+      - models/XGBoost.pkl
 
   model_evaluation:
-    cmd: python src/evaluate.py --model-dir models --test-data data/processed/test.csv --metrics-dir metrics --params params.yaml
+    cmd: python src/evaluate.py --model-dir models --test-data data/processed/test.csv --metrics-file metrics.json
     deps:
       - src/evaluate.py
-      - models/${model.name}.pkl
+      - models/Logistic_Regression.pkl
+      - models/Random_Forest.pkl
+      - models/XGBoost.pkl
       - data/processed/test.csv
-    params:
-      - model.name
     metrics:
-      - metrics/${model.name}.json:
+      - metrics.json:
           cache: false

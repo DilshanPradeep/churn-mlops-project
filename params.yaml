@@ -1,6 +1,0 @@
-model:
-  name: XGBoost               # one of: Logistic_Regression, Random_Forest, XGBoost
-  n_estimators: 100           # used by Random_Forest
-  max_iter: 1000              # used by Logistic_Regression
-  max_depth: 6                # used by XGBoost
-  learning_rate: 0.1          # used by XGBoost

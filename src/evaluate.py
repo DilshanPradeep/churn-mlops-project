@@ -7,6 +7,7 @@ import joblib
 import os
 import argparse
 import json
+import dagshub
 
 def eval_metrics(actual, pred):
     accuracy = accuracy_score(actual, pred)
@@ -33,6 +34,8 @@ def evaluate_models(model_dir, test_data_path, output_metrics_file):
     best_accuracy = 0.0
     best_model_name = ""
     
+    # Initialize DagShub MLflow tracking
+    dagshub.init(repo_owner="DilshanPradeep", repo_name="churn-mlops-project", mlflow=True)
     mlflow.set_experiment("Churn_Prediction_Evaluation")
     
     metrics_summary = {}

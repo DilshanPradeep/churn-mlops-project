@@ -46,25 +46,30 @@ stages:
       md5: 3dccc185ad1bd592014e2c93cd58e4b5
       size: 1551
   model_training:
-    cmd: python src/train.py --data data/processed/train.csv --model-dir models
+    cmd: python src/train.py --data data/processed/train.csv --model-dir models 
+      --test-data data/processed/test.csv
     deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 61008c59eb9cabee7b596a49e14cfa7d
+      size: 528224
     - path: data/processed/train.csv
       hash: md5
       md5: 9a4548686cedb1efce9d8be9d7bc8180
       size: 2110870
     - path: src/train.py
       hash: md5
-      md5: e8f4ca14a47a31407ba9f383943c0070
-      size: 2941
+      md5: bb457e3e21acb347ae9540659246fce5
+      size: 3934
     outs:
     - path: models/Logistic_Regression.pkl
       hash: md5
-      md5: 8c59830bcde5ab47cd1ae5764c7fa269
+      md5: 0a76dc33a03fc8c030139ba86e8703fb
       size: 1551
     - path: models/Random_Forest.pkl
       hash: md5
-      md5: d1b033b9318a7cddc779f66c33d014ed
-      size: 17828361
+      md5: a151a4a65022d59ed49a1096a2c88886
+      size: 17829001
     - path: models/XGBoost.pkl
       hash: md5
       md5: 2b255dc5846e8a4324b2583a48169b03
@@ -79,22 +84,22 @@ stages:
       size: 528224
     - path: models/Logistic_Regression.pkl
       hash: md5
-      md5: 8c59830bcde5ab47cd1ae5764c7fa269
+      md5: 0a76dc33a03fc8c030139ba86e8703fb
       size: 1551
     - path: models/Random_Forest.pkl
       hash: md5
-      md5: d1b033b9318a7cddc779f66c33d014ed
-      size: 17828361
+      md5: a151a4a65022d59ed49a1096a2c88886
+      size: 17829001
     - path: models/XGBoost.pkl
       hash: md5
       md5: 2b255dc5846e8a4324b2583a48169b03
       size: 287513
     - path: src/evaluate.py
       hash: md5
-      md5: d1bce38a3ef295e2b134991a6533f711
-      size: 3235
+      md5: 7950d4cc4a0f101f40fb6ecdb819adee
+      size: 3386
     outs:
     - path: metrics.json
       hash: md5
-      md5: e92c7b5994df8e2bbabf2ec4c38f3cf1
-      size: 930
+      md5: 409f66c05b803a465355a574c334aa2c
+      size: 929

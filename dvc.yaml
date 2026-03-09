@@ -19,10 +19,11 @@ stages:
       - models/encoders.pkl
 
   model_training:
-    cmd: python src/train.py --data data/processed/train.csv --model-dir models
+    cmd: python src/train.py --data data/processed/train.csv --model-dir models --test-data data/processed/test.csv
     deps:
       - src/train.py
       - data/processed/train.csv
+      - data/processed/test.csv
     outs:
       - models/Logistic_Regression.pkl
       - models/Random_Forest.pkl

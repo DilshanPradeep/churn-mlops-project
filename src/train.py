@@ -9,6 +9,7 @@ import joblib
 import os
 import argparse
 import json
+import dagshub
 
 def train_models(train_data_path, model_dir):
     # Load Data
@@ -42,9 +43,9 @@ def train_models(train_data_path, model_dir):
     # The original code did train/test split in preprocessing.
     
     # Let's start MLflow run
-    # Set tracking URI - You must set this via env var or here
-    # mlflow.set_tracking_uri("...") 
-    
+    # Initialize DagShub MLflow tracking
+    dagshub.init(repo_owner="DilshanPradeep", repo_name="churn-mlops-project", mlflow=True)
+
     mlflow.set_experiment("Churn_Prediction_Training")
 
     os.makedirs(model_dir, exist_ok=True)  # already created above, harmless

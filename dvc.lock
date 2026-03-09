@@ -54,8 +54,8 @@ stages:
       size: 2110870
     - path: src/train.py
       hash: md5
-      md5: 0660b63cc08120b20fa709aa108a8105
-      size: 2897
+      md5: e8f4ca14a47a31407ba9f383943c0070
+      size: 2941
     outs:
     - path: models/Logistic_Regression.pkl
       hash: md5
@@ -63,8 +63,8 @@ stages:
       size: 1551
     - path: models/Random_Forest.pkl
       hash: md5
-      md5: 70f0c562e348937f43333b8bcd507e6e
-      size: 17785641
+      md5: d1b033b9318a7cddc779f66c33d014ed
+      size: 17828361
     - path: models/XGBoost.pkl
       hash: md5
       md5: 2b255dc5846e8a4324b2583a48169b03
@@ -83,8 +83,8 @@ stages:
       size: 1551
     - path: models/Random_Forest.pkl
       hash: md5
-      md5: 70f0c562e348937f43333b8bcd507e6e
-      size: 17785641
+      md5: d1b033b9318a7cddc779f66c33d014ed
+      size: 17828361
     - path: models/XGBoost.pkl
       hash: md5
       md5: 2b255dc5846e8a4324b2583a48169b03
@@ -96,5 +96,5 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: c40cee5e371109634ce24c5ffb44bf0b
-      size: 701
+      md5: e92c7b5994df8e2bbabf2ec4c38f3cf1
+      size: 930

@@ -3,6 +3,7 @@ numpy
 scikit-learn
 xgboost
 mlflow
+dagshub
 dvc
 fastapi
 uvicorn
